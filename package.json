@@ -1,0 +1,13 @@
+{
+  "name": "web_crawler",
+  "version": "1.0.0",
+  "description": "Simple webCrawler to practice node.js",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fernando Calatayud",
+  "license": "ISC"
+}
