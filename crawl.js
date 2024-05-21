@@ -49,6 +49,33 @@ function getURLsFromHTML(htmlBody, baseURL){
     return absoluteURLs
 }
 
+async function crawlPage(currentURL){
+    try{
+        const response = await fetch(currentURL, {
+            method: 'GET', // Request method
+            headers: {
+              //'Content-Type': 'application/json', // Headers
+            }
+          })
 
+        if (!response.ok) {
+            throw new Error("Network response was not OK");
+        }
+    
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('text/html')) {
+            throw new Error("Expected HTML response")
+        }
 
-export { normalizeURL,  getURLsFromHTML};
+        // I'm not parsing a body to get data, but HTML file
+        //const reponseObject = await response.json()
+        const htmlBody = await response.text()
+
+        console.log(htmlBody)
+        
+    } catch(err){
+        console.log(err)
+    }
+}
+
+export { normalizeURL,  getURLsFromHTML, crawlPage};
