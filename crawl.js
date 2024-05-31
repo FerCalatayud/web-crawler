@@ -76,16 +76,12 @@ async function fetchPage(currentURL){
 }
 
 async function crawlPage(baseURL, currentURL = baseURL, pages = {}){
-
-    console.log(`We are in crawlPage!`)
     
     try{
         const objCurrentUrl = new URL(currentURL)
         const objBaseUrl = new URL(baseURL)
 
         if (objBaseUrl.hostname !== objCurrentUrl.hostname){
-            console.log(`Base URL: ${objBaseUrl.hostname}`)
-            console.log(`Current URL: ${objCurrentUrl.hostname}`)
             return pages
         }
 
@@ -93,7 +89,7 @@ async function crawlPage(baseURL, currentURL = baseURL, pages = {}){
 
         if (normCurrentUrl in pages) {
             pages[normCurrentUrl] = pages[normCurrentUrl] + 1
-            console.log(`Existing page: ${normCurrentUrl}`)
+            //console.log(`Existing page: ${normCurrentUrl}`)
             return pages
         } else {
             pages[normCurrentUrl] = 1
