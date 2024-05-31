@@ -6,7 +6,7 @@ function normalizeURL(url) {
     
         let normUrl = `${objtUrl.host}${objtUrl.pathname}`
 
-        if (normUrl.endsWith('/')){
+        if (normUrl.slice(-1) === '/'){
             normUrl = normUrl.slice(0, -1);
         }
 
@@ -49,20 +49,17 @@ function getURLsFromHTML(htmlBody, baseURL){
     return absoluteURLs
 }
 
-async function crawlPage(currentURL){
+async function fetchPage(currentURL){
+
     try{
-        const response = await fetch(currentURL, {
-            method: 'GET', // Request method
-            headers: {
-              //'Content-Type': 'application/json', // Headers
-            }
-          })
+        let response = await fetch(currentURL)
 
         if (!response.ok) {
             throw new Error("Network response was not OK");
         }
-    
+
         const contentType = response.headers.get('content-type');
+        console.log('Content-Type:', contentType);
         if (!contentType || !contentType.includes('text/html')) {
             throw new Error("Expected HTML response")
         }
@@ -71,11 +68,52 @@ async function crawlPage(currentURL){
         //const reponseObject = await response.json()
         const htmlBody = await response.text()
 
-        console.log(htmlBody)
+        return htmlBody
         
     } catch(err){
         console.log(err)
     }
 }
 
-export { normalizeURL,  getURLsFromHTML, crawlPage};
+async function crawlPage(baseURL, currentURL = baseURL, pages = {}){
+
+    console.log(`We are in crawlPage!`)
+    
+    try{
+        const objCurrentUrl = new URL(currentURL)
+        const objBaseUrl = new URL(baseURL)
+
+        if (objBaseUrl.hostname !== objCurrentUrl.hostname){
+            console.log(`Base URL: ${objBaseUrl.hostname}`)
+            console.log(`Current URL: ${objCurrentUrl.hostname}`)
+            return pages
+        }
+
+        let normCurrentUrl = normalizeURL(currentURL)
+
+        if (normCurrentUrl in pages) {
+            pages[normCurrentUrl] = pages[normCurrentUrl] + 1
+            console.log(`Existing page: ${normCurrentUrl}`)
+            return pages
+        } else {
+            pages[normCurrentUrl] = 1
+            console.log(`New page: ${normCurrentUrl}`)
+        }
+
+        let currentUrlHtmlBody = await fetchPage(currentURL)
+
+        const absoluteURLs = getURLsFromHTML(currentUrlHtmlBody, baseURL)
+
+        for (let url of absoluteURLs){
+            pages = await crawlPage(baseURL, url, pages)
+        }
+
+        return pages
+
+        
+    } catch(err){
+        console.log(err)
+    }
+}
+
+export { normalizeURL,  getURLsFromHTML, fetchPage, crawlPage};
